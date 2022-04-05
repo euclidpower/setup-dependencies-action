@@ -1,0 +1,14 @@
+name: Set up Ruby and NodeJS
+description: Setting up and caching dependencies of euclidpower/webapp
+runs:
+  using: composite
+  steps:
+    - uses: ruby/setup-ruby@v1
+      with:
+        bundler-cache: true
+    - uses: actions/setup-node@v3
+      with:
+        node-version-file: .node-version
+        cache: yarn
+    - run: yarn --prefer-offline
+      shell: bash
