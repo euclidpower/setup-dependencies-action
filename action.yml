@@ -1,4 +1,4 @@
-name: Set up Ruby and NodeJS
+name: Set up and cache Ruby and NodeJS
 description: Setting up and caching dependencies of euclidpower/webapp
 runs:
   using: composite
@@ -6,9 +6,27 @@ runs:
     - uses: ruby/setup-ruby@v1
       with:
         bundler-cache: true
+
     - uses: actions/setup-node@v3
       with:
         node-version-file: .node-version
         cache: yarn
-    - run: yarn --prefer-offline
+
+    - run: yarn install --frozen-lockfile
       shell: bash
+
+    - name: Get installed Playwright version
+      run: echo "PLAYWRIGHT_VERSION=$(yarn info @playwright/test --json | jq --raw-output '.data.version')" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Cache Playwright binaries
+      uses: actions/cache@v3
+      id: playwright-cache
+      with:
+        path: ~/.cache/ms-playwright
+        key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+
+    - name: Download Playwright dependencies and browsers
+      run: yarn playwright install --with-deps chromium
+      shell: bash
+      if: steps.playwright-cache.outputs.cache-hit != 'true'
