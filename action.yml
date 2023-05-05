@@ -16,7 +16,8 @@ runs:
       shell: bash
 
     - name: Get installed Playwright version
-      run: echo "PLAYWRIGHT_VERSION=$(yarn info @playwright/test --json | jq --raw-output '.data.version')" >> $GITHUB_ENV
+      id: playwright-version
+      run: echo "::set-output name=version::$(yarn list --pattern="@playwright/test" --json | jq '.data.trees[0].name' -r | sed 's/.*@//')"
       shell: bash
 
     - name: Cache Playwright binaries
@@ -24,7 +25,9 @@ runs:
       id: playwright-cache
       with:
         path: ~/.cache/ms-playwright
-        key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+        key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}
+        restore-keys: |
+            ${{ runner.os }}-playwright-
 
     - name: Download Playwright dependencies and browsers
       run: yarn playwright install --with-deps chromium
