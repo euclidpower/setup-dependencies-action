@@ -16,8 +16,7 @@ runs:
       shell: bash
 
     - name: Get installed Playwright version
-      id: playwright-version
-      run: echo "::set-output name=version::$(yarn list --pattern="@playwright/test" --json | jq '.data.trees[0].name' -r | sed 's/.*@//')"
+      run: echo "PLAYWRIGHT_VERSION=$(yarn list --pattern="@playwright/test" --json | jq '.data.trees[0].name' -r | sed 's/.*@//')" >> $GITHUB_ENV
       shell: bash
 
     - name: Cache Playwright binaries
@@ -25,7 +24,7 @@ runs:
       id: playwright-cache
       with:
         path: ~/.cache/ms-playwright
-        key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}
+        key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
         restore-keys: |
             ${{ runner.os }}-playwright-
 
