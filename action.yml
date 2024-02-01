@@ -1,5 +1,10 @@
 name: Set up and cache Ruby and NodeJS
 description: Setting up and caching dependencies of euclidpower/webapp
+inputs:
+  cache_playwright:
+    description: Should Cache Playwright binaries
+    required: false
+    default: "0"
 runs:
   using: composite
   steps:
@@ -16,19 +21,21 @@ runs:
       shell: bash
 
     - name: Get installed Playwright version
+      if: inputs.cache_playwright != '0'
       run: echo "PLAYWRIGHT_VERSION=$(yarn list --pattern="@playwright/test" --json | jq '.data.trees[0].name' -r | sed 's/.*@//')" >> $GITHUB_ENV
       shell: bash
 
     - name: Cache Playwright binaries
+      if: inputs.cache_playwright != '0'
       uses: actions/cache@v4
       id: playwright-cache
       with:
         path: ~/.cache/ms-playwright
         key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
         restore-keys: |
-            ${{ runner.os }}-playwright-
+          ${{ runner.os }}-playwright-
 
     - name: Download Playwright dependencies and browsers
+      if: inputs.cache_playwright != '0' && steps.playwright-cache.outputs.cache-hit != 'true'
       run: yarn playwright install --with-deps chromium
       shell: bash
-      if: steps.playwright-cache.outputs.cache-hit != 'true'
