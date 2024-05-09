@@ -12,6 +12,7 @@ runs:
       with:
         bundler-cache: true
 
+    - run: corepack enable
     - uses: actions/setup-node@v4
       with:
         node-version-file: package.json
