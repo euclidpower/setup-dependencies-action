@@ -24,7 +24,7 @@ runs:
 
     - name: Get installed Playwright version
       if: inputs.cache_playwright != '0'
-      run: echo "PLAYWRIGHT_VERSION=$(yarn list --pattern="@playwright/test" --json | jq '.data.trees[0].name' -r | sed 's/.*@//')" >> $GITHUB_ENV
+      run: echo "PLAYWRIGHT_VERSION=$(yarn info --name-only | grep '@playwright/test' | sed 's/.*@npm://')" >> $GITHUB_ENV
       shell: bash
 
     - name: Cache Playwright binaries
