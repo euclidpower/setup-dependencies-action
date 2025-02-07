@@ -12,6 +12,11 @@ inputs:
 runs:
   using: composite
   steps:
+    # The ruby/setup-ruby action excepts this file to be located in the working directory
+    # so to avoid having it duplicated in the repo, we copy it during build time
+    - run: cp ${{ github.workspace }}/.ruby-version ./rails/
+      shell: bash
+
     - uses: ruby/setup-ruby@v1
       with:
         bundler-cache: true
