@@ -15,7 +15,7 @@ runs:
     - uses: ruby/setup-ruby@v1
       with:
         bundler-cache: true
-      working-directory: ./rails/
+        working-directory: ./rails/
 
     - run: corepack enable
       shell: bash
