@@ -12,7 +12,7 @@ inputs:
 runs:
   using: composite
   steps:
-    # The ruby/setup-ruby action excepts this file to be located in the working directory
+    # The ruby/setup-ruby action excepts this file to be located in the working directory,
     # so to avoid having it duplicated in the repo, we copy it during build time
     - run: cp ${{ github.workspace }}/.ruby-version ./rails/
       shell: bash
@@ -32,6 +32,15 @@ runs:
 
     - run: yarn install --immutable
       shell: bash
+
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@ac638b010cf58a27ee6c972d7336334ccaf61c96 # v4.4.1
 
     - name: Cache Playwright binaries
       if: inputs.cache_playwright != '0'
