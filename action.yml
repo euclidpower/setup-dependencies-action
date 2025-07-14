@@ -33,37 +33,6 @@ runs:
     - run: yarn install --immutable
       shell: bash
 
-    - name: Set up JDK
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-
-    - name: Get the current gradle distribution
-      id: get-gradle-dist
-      shell: bash
-      run: |
-        GRADLE_DIST=$(sed -E -n 's/distributionUrl=.*\/(gradle-.*.zip)/\1/p' ./ktserver/gradle/wrapper/gradle-wrapper.properties)
-        if [[ -z "$GRADLE_DIST" ]]; then
-          echo "Failed to locate the current gradle distribution"
-          exit 1
-        fi
-        echo "Found gradle distribution: $GRADLE_DIST"
-        echo gradle-dist="$GRADLE_DIST" >> "$GITHUB_OUTPUT"
-
-    - name: Gradle cache
-      uses: actions/cache@v4
-      id: gradle-cache
-      with:
-        path: ~/.gradle/wrapper/dists/
-        key: ${{ runner.os }}-${{ steps.get-gradle-dist.outputs.gradle-dist }}
-
-    - name: Download Gradle distribution
-      if: steps.gradle-cache.outputs.cache-hit != 'true'
-      run: ./gradlew tasks --console=plain
-      working-directory: ./ktserver/
-      shell: bash
-
     - name: Cache Playwright binaries
       if: inputs.cache_playwright != '0'
       uses: actions/cache@v4
