@@ -49,7 +49,7 @@ runs:
       id: playwright-cache
       with:
         path: ~/.cache/ms-playwright
-        key: ${{ runner.os }}-playwright-${{ $PLAYWRIGHT_VERSION }}
+        key: ${{ runner.os }}-playwright-${{ steps.get-playwright-version.outputs.playwright-version }}
 
     - name: Download Playwright dependencies and browsers
       if: steps.get-playwright-version.outputs.playwright-version != '' && steps.playwright-cache.outputs.cache-hit != 'true'
