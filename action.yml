@@ -5,10 +5,6 @@ inputs:
     description: Should Cache Playwright binaries
     required: false
     default: "0"
-  playwright_version:
-    description: The version we are using
-    required: false
-    default: "1.54.1"
 runs:
   using: composite
   steps:
@@ -30,18 +26,32 @@ runs:
         node-version-file: package.json
         cache: 'yarn'
 
+    - name: 'Get Playwright version from package.json'
+      if: inputs.cache_playwright != '0'
+      id: get-playwright-version
+      shell: bash
+      run: |
+        PLAYWRIGHT_VERSION=`jq '.dependencies["@playwright/test"]' package.json`
+        if [[ "$PLAYWRIGHT_VERSION" == "null" ]] || [[ -z "$PLAYWRIGHT_VERSION" ]]; then
+          echo "Failed to locate Playwright version"
+          exit 1
+        fi
+
+        echo "Current Playwright version: $PLAYWRIGHT_VERSION"
+        echo playwright-version='$PLAYWRIGHT_VERSION' >> "$GITHUB_OUTPUT"
+
     - run: yarn install --immutable
       shell: bash
 
     - name: Cache Playwright binaries
-      if: inputs.cache_playwright != '0'
+      if: inputs.cache_playwright != '0' && steps.get-playwright-version.outputs.playwright-version != ''
       uses: actions/cache@v4
       id: playwright-cache
       with:
         path: ~/.cache/ms-playwright
-        key: ${{ runner.os }}-playwright-${{ inputs.playwright_version }}
+        key: ${{ runner.os }}-playwright-${{ $PLAYWRIGHT_VERSION }}
 
     - name: Download Playwright dependencies and browsers
-      if: inputs.cache_playwright != '0' && steps.playwright-cache.outputs.cache-hit != 'true'
+      if: steps.get-playwright-version.outputs.playwright-version != '' && steps.playwright-cache.outputs.cache-hit != 'true'
       run: yarn playwright install --with-deps chromium
       shell: bash
