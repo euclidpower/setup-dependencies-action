@@ -31,7 +31,7 @@ runs:
       id: get-playwright-version
       shell: bash
       run: |
-        PLAYWRIGHT_VERSION=`jq '.dependencies["@playwright/test"]' package.json`
+        PLAYWRIGHT_VERSION=`jq -r '.dependencies["@playwright/test"]' package.json`
         if [[ "$PLAYWRIGHT_VERSION" == "null" ]] || [[ -z "$PLAYWRIGHT_VERSION" ]]; then
           echo "Failed to locate Playwright version"
           exit 1
