@@ -38,7 +38,7 @@ runs:
         fi
 
         echo "Current Playwright version: $PLAYWRIGHT_VERSION"
-        echo playwright-version='$PLAYWRIGHT_VERSION' >> "$GITHUB_OUTPUT"
+        echo playwright-version="$PLAYWRIGHT_VERSION" >> "$GITHUB_OUTPUT"
 
     - run: yarn install --immutable
       shell: bash
